@@ -55,31 +55,9 @@ def teardown_request(exception):
         db.close()
 
 
-# ----------------数据库表操作--------------------#
-# 业主信息管理——获取所有业主用户名
-@app.route('/myapi/owners', methods=['GET'])
-def get_all_owners():
-    cursor = g.db.cursor()
-    query = """
-        SELECT id, username
-        FROM personal_info
-    """
-    cursor.execute(query)
+# -------------------------------数据库表操作------------------------------------#
 
-    result = cursor.fetchall()
-    cursor.close()
-
-    owners = []
-    if result:
-        for row in result:
-            owners.append({
-                'id': row['id'],
-                'username': row['username']
-            })
-    return jsonify(owners)
-
-
-# -----个人信息(业主信息）管理部分------#
+# -----------------个人信息(业主信息）管理部分-----------------#
 def get_personal_info_by_id(owner_id):
     cursor = g.db.cursor()
     query = """
@@ -142,7 +120,31 @@ def get_info():
     return get_personal_info_by_id(owner_id)
 
 
-# 由前端调用自动更新
+# ----------------业主信息管理——获取所有业主用户名-----------------#
+@app.route('/myapi/owners', methods=['GET'])
+def get_all_owners():
+    cursor = g.db.cursor()
+    query = """
+        SELECT id, username
+        FROM personal_info
+    """
+    cursor.execute(query)
+
+    result = cursor.fetchall()
+    cursor.close()
+
+    owners = []
+    if result:
+        for row in result:
+            owners.append({
+                'id': row['id'],
+                'username': row['username']
+            })
+    return jsonify(owners)
+
+
+# -----------------个人信息(业主信息）更新部分-----------------#
+# 更新数据——由前端调用自动更新
 @app.route('/myapi/info_update', methods=['PUT'])
 def update_personal_info():
     data = request.get_json()
@@ -191,6 +193,7 @@ def update_personal_info():
     return jsonify({"message": "Personal info updated successfully"})
 
 
+# 上传头像
 @app.route('/upload_avatar', methods=['POST'])
 def upload_avatar():
     owner_id = request.args.get('owner_id', None, type=int)  # 获取owner_id参数
@@ -222,47 +225,154 @@ def upload_avatar():
         return jsonify({"error": "Unsupported file type"}), 400
 
 
-# -------------------------#
-
-
-# 插入数据到 personal_info 表的函数
-def insert_personal_info(db, data):
-    cursor = db.cursor()
-    sql = """
-        INSERT INTO personal_info (
-            username, phone, address, email, community_name, building_number,
-            unit_number, door_number, parking_number, security_card_number,
-            emergency_contact, emergency_contact_phone,avatar_url
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
-    """
-    cursor.executemany(sql, data)
-    db.commit()
-    cursor.close()
-
-
-# 检查文件是否为允许的文件类型
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+# ---------------------------------------------------------------#
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part in the request"}), 400
+# -----------------车辆信息部分-----------------#
+# 获取用户列表
+@app.route('/user/list', methods=['POST'])
+def get_user_list():
+    data = request.get_json()
+    page = data.get("page", 1)
+    size = data.get("size", 10)
 
-    myfile = request.files['file']
+    cursor = g.db.cursor()
+    query = """
+        SELECT * FROM user
+        LIMIT %s OFFSET %s
+    """
+    cursor.execute(query, (size, (page - 1) * size))
+    result = cursor.fetchall()
+    cursor.close()
 
-    if myfile.filename == '':
-        return jsonify({"error": "No file selected"}), 400
+    users = []
+    if result:
+        for row in result:
+            users.append({
+                'id': row['id'],
+                'username': row['username'],
+                'email': row['email'],
+                'gender': row['gender'],
+                'status': row['status'],
+                'department': row['department'],
+                'role': row['role'],
+            })
 
-    if myfile and allowed_file(myfile.filename):
-        filename = secure_filename(myfile.filename)
-        myfile.save(os.path.join(app.config['UPLOAD_FILE_FOLDER'], filename))
-        return jsonify({"message": "File uploaded successfully"}), 200
-    else:
-        return jsonify({"error": "Unsupported file type"}), 400
+    return jsonify({'list': users, 'total': len(users)})
 
+
+# 新增用户
+@app.route('/user/add', methods=['POST'])
+def add_user():
+    data = request.get_json()
+    username = data.get("username")
+    email = data.get("email")
+    gender = data.get("gender")
+    status = data.get("status")
+    department = data.get("department")
+    role = data.get("role")
+
+    cursor = g.db.cursor()
+    query = """
+        INSERT INTO user (username, email, gender, status, department, role)
+        VALUES (%s, %s, %s, %s, %s, %s)
+    """
+    cursor.execute(query, (username, email, gender, status, department, role))
+    g.db.commit()
+    cursor.close()
+
+    return jsonify({"message": "User added successfully"})
+
+
+# 编辑用户
+@app.route('/user/edit', methods=['POST'])
+def edit_user():
+    data = request.get_json()
+    user_id = data.get("id")
+    username = data.get("username")
+    email = data.get("email")
+    gender = data.get("gender")
+    status = data.get("status")
+    department = data.get("department")
+    role = data.get("role")
+
+    cursor = g.db.cursor()
+    query = """
+        UPDATE user SET
+            username=%s,
+            email=%s,
+            gender=%s,
+            status=%s,
+            department=%s,
+            role=%s
+        WHERE id=%s
+    """
+    cursor.execute(query, (username, email, gender, status, department, role, user_id))
+    g.db.commit()
+    cursor.close()
+
+    return jsonify({"message": "User updated successfully"})
+
+
+# 删除用户
+@app.route('/user/delete', methods=['POST'])
+def delete_user():
+    data = request.get_json()
+    user_ids = data.get("id")
+
+    cursor = g.db.cursor()
+    query = """
+        DELETE FROM user WHERE id IN %s
+    """
+    cursor.execute(query, (user_ids,))
+    g.db.commit()
+    cursor.close()
+
+    return jsonify({"message": "User(s) deleted successfully"})
+
+
+# 切换用户状态
+@app.route('/user/change', methods=['POST'])
+def change_user_status():
+    data = request.get_json()
+    user_id = data.get("id")
+    new_status = data.get("status")
+
+    cursor = g.db.cursor()
+    query = """
+        UPDATE user
+        SET
+        status=%s
+        WHERE id=%s
+        """
+    cursor.execute(query, (new_status, user_id))
+    g.db.commit()
+    cursor.close()
+    return jsonify({"message": "User status updated successfully"})
+
+
+#
+# # 插入数据到 personal_info 表的函数
+# def insert_personal_info(db, data):
+#     cursor = db.cursor()
+#     sql = """
+#     INSERT
+#     INTO
+#     personal_info(
+#         username, phone, address, email, community_name, building_number,
+#         unit_number, door_number, parking_number, security_card_number,
+#         emergency_contact, emergency_contact_phone, avatar_url
+#     )
+#     VALUES( % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s)
+#     """
+#     cursor.executemany(sql, data)
+#     db.commit()
+#     cursor.close()
+
+
+# 检查文件是否为允许的文件类型
 
 @app.route('/', methods=['GET', 'POST'])
 def hello():

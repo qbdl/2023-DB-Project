@@ -163,7 +163,7 @@
 				{
 					"path": "/staff/staff2",
 					"name": "staff2",
-					"component": "/proTable/useTreeFilter/index",
+					"component": "/car_detailed/index",
 					"meta": {
 						"icon": "Menu",
 						"title": "业主车辆",
