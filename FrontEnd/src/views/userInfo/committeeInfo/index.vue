@@ -2,7 +2,7 @@
     <div class="main-container">
         <div class="left-panel">
             <el-select v-model="selectedOwner" placeholder="请选择业主特征信息" @change="handleOwnerChange">
-                <el-option v-for="item in owners" :key="item.id" :label="item.name" :value="item"></el-option>
+                <el-option v-for=" item in owners" :key="item.id" :label="item.username" :value="item"></el-option>
             </el-select>
         </div>
         <div class="right-panel">
@@ -12,7 +12,7 @@
                 </div>
                 <!-- Add avatar container and input for uploading image -->
                 <div class="avatar-container">
-                    <img :src="selectedOwner.avatar || defaultAvatar" class="avatar">
+                    <img :src="defaultAvatar || selectedOwner.avatar_url" class="avatar">
                     <input v-if="editing" type="file" @change="uploadImage" ref="fileInput">
                 </div>
                 <el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" :size="'large'" border>
@@ -60,86 +60,128 @@
 </template>
   
 <script lang="js">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios"; // 导入 axios 库——用于向后端发出 HTTP 请求，以获取和发送数据
 
 export default {
     name: "ownerInfo",
     setup() {
         let editing = ref(false);
         let fileInput = ref(null);
+        let owners = ref(null);
         let defaultAvatar = "../../assets/images/userpic.jpg"; // Set the URL of the default avatar image
-
-        const owners = [
-            {
-                id: 1,
-                name: "张三",
-                username: "zhangsan",
-                phone: "13912345678",
-                address: "上海市浦东新区",
-                email: "zhangsan@example.com",
-                communityName: "阳光花园",
-                buildingNumber: "5栋",
-                unitNumber: "2单元",
-                doorNumber: "502室",
-                parkingNumber: "B-102",
-                securityCardNumber: "AF-123456",
-                emergencyContact: "李四",
-                emergencyContactPhone: "18212345678",
-            },
-            {
-                id: 2,
-                name: "李四",
-                username: "lisi",
-                phone: "13923456789",
-                address: "上海市浦东新区",
-                email: "lisi@example.com",
-                communityName: "阳光花园",
-                buildingNumber: "3栋",
-                unitNumber: "1单元",
-                doorNumber: "301室",
-                parkingNumber: "B-103",
-                securityCardNumber: "AF-123457",
-                emergencyContact: "王五",
-                emergencyContactPhone: "13934567890",
-            },
-            // 更多业主信息
-        ];
-
+        let avatar_url = ref("../../assets/images/userpic.jpg")//初始化为../../assets/images/userpic.jpg
 
         let selectedOwner = ref(null);
 
-        let handleOwnerChange = function (selected) {
-            selectedOwner.value = selected;
+        //从后端获取 选择的业主信息
+        let handleOwnerChange = async function () {
+            try {
+                const selectedId = selectedOwner.value.id; // 从当前选中的业主获取ID
+                const response = await axios.get("http://localhost:5000/myapi/info",
+                    {
+                        params:
+                            { is_owner: 1, owner_id: selectedId } // 业主信息
+                    });
+                selectedOwner.value = response.data;
+                console.log("getOwners data:", response.data);
+            } catch (error) {
+                console.error(error);
+                alert("无法获取业主信息，请重试");
+            }
         };
 
-        let editProfile = function () {
+
+        //按钮触发事件
+        let editProfile = async function () {
             editing.value = !editing.value;
             if (!editing.value) {
                 // Save the updated profile here
-                // e.g. send the updated data to the server via API call
+                // console.log("editProfile:", selectedOwner.value);
+                // console.log(selectedOwner.value.id);
+                const data = {
+                    owner_id: selectedOwner.value.owner_id,
+                    username: selectedOwner.value.username,
+                    phone: selectedOwner.value.phone,
+                    address: selectedOwner.value.address,
+                    email: selectedOwner.value.email,
+                    communityName: selectedOwner.value.communityName,
+                    buildingNumber: selectedOwner.value.buildingNumber,
+                    unitNumber: selectedOwner.value.unitNumber,
+                    doorNumber: selectedOwner.value.doorNumber,
+                    parkingNumber: selectedOwner.value.parkingNumber,
+                    securityCardNumber: selectedOwner.value.securityCardNumber,
+                    emergencyContact: selectedOwner.value.emergencyContact,
+                    emergencyContactPhone: selectedOwner.value.emergencyContactPhone,
+                    avatar_url: selectedOwner.value.avatar_url
+                };
+                //传回给后端数据库
+                try {
+                    await axios.put("http://localhost:5000/myapi/info_update", data, {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    alert("业主信息更新成功");
+                } catch (error) {
+                    console.error(error);
+                    alert("业主信息更新失败，请重试");
+                }
             }
         };
+
 
         let uploadImage = function (event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    selectedOwner.value.avatar = e.target.result;
+                    selectedOwner.value.avatar_url = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         };
 
+
+        // 从后端获取初始业主列表
+        const fetchOwners = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/myapi/owners");
+                // console.log('API response:', response.data); // 添加这一行
+                owners.value = response.data;
+                console.log("handleOwnerChange data:", response.data); // 添加此行
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        // 在组件挂载时从后端获取数据
+        onMounted(fetchOwners);
+
+
         return {
+            fileInput,
+            defaultAvatar,
+            editing,
+
+            // username,
+            // phone,
+            // address,
+            // email,
+            // communityName,
+            // buildingNumber,
+            // unitNumber,
+            // doorNumber,
+            // parkingNumber,
+            // securityCardNumber,
+            // emergencyContact,
+            // emergencyContactPhone,
+            avatar_url,
+
             owners,
             selectedOwner,
             handleOwnerChange,
             editProfile,
-            editing,
-            fileInput,
             uploadImage,
-            defaultAvatar,
         };
     },
 };
@@ -168,8 +210,8 @@ export default {
 }
 
 .avatar {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 10px;

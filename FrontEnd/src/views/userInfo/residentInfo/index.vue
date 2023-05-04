@@ -5,7 +5,7 @@
         </div>
         <!-- Add avatar container and input for uploading image -->
         <div class="avatar-container">
-            <img :src="avatar || defaultAvatar" class="avatar">
+            <img :src="defaultAvatar || avatar_url" class="avatar">
             <input v-if="editing" type="file" @change="uploadImage" ref="fileInput">
         </div>
 
@@ -54,7 +54,8 @@
 </template>
 
 <script lang="js">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios"; // 导入 axios 库——用于向后端发出 HTTP 请求，以获取和发送数据
 
 export default {
     name: "personalInfo",
@@ -63,46 +64,114 @@ export default {
         let fileInput = ref(null);
         let editing = ref(false);
 
-        let avatar = ref("../../assets/images/userpic.jpg")
-        let defaultAvatar = "../../assets/images/userpic.jpg"; // Set the URL of the default avatar image
-        let username = ref("qbdl");
-        let phone = ref("18105022730");
-        let address = ref("苏州市吴中区吴中大道1188号");
-        let email = ref("likejie@tongji.edu.cn");
-        let communityName = ref("阳光花园");
-        let buildingNumber = ref("5栋");
-        let unitNumber = ref("2单元");
-        let doorNumber = ref("502室");
-        let parkingNumber = ref("B-102");
-        let securityCardNumber = ref("AF-123456");
-        let emergencyContact = ref("张三");
-        let emergencyContactPhone = ref("18212345678");
+        let defaultAvatar = "../../assets/images/userpic.jpg";
+        let owner_id = ref(null);
+        let username = ref(null); // 初始化为 null
+        let phone = ref(null); // 初始化为 null
+        let address = ref(null); // 初始化为 null
+        let email = ref(null); // 初始化为 null
+        let communityName = ref(null); // 初始化为 null
+        let buildingNumber = ref(null); // 初始化为 null
+        let unitNumber = ref(null); // 初始化为 null
+        let doorNumber = ref(null); // 初始化为 null
+        let parkingNumber = ref(null); // 初始化为 null
+        let securityCardNumber = ref(null); // 初始化为 null
+        let emergencyContact = ref(null); // 初始化为 null
+        let emergencyContactPhone = ref(null); // 初始化为 null
+        let avatar_url = ref("../../assets/images/userpic.jpg")//初始化为../../assets/images/userpic.jpg
 
-        let editProfile = function () {
+        let editProfile = async function () {
             editing.value = !editing.value;
             if (!editing.value) {
                 // Save the updated profile here
-                // e.g. send the updated data to the server via API call
+                const data = {
+                    owner_id: owner_id.value,
+                    username: username.value,
+                    phone: phone.value,
+                    address: address.value,
+                    email: email.value,
+                    communityName: communityName.value,
+                    buildingNumber: buildingNumber.value,
+                    unitNumber: unitNumber.value,
+                    doorNumber: doorNumber.value,
+                    parkingNumber: parkingNumber.value,
+                    securityCardNumber: securityCardNumber.value,
+                    emergencyContact: emergencyContact.value,
+                    emergencyContactPhone: emergencyContactPhone.value,
+                    avatar_url: avatar_url.value
+                };
+                //传回给后端数据库
+                try {
+                    await axios.put("http://localhost:5000/myapi/info_update", data);
+                    alert("个人信息更新成功");
+                } catch (error) {
+                    console.error(error);
+                    alert("个人信息更新失败，请重试");
+                }
             }
         };
 
-        let uploadImage = function (event) {
+        //上传头像
+        const uploadImage = async (event) => {
             const file = event.target.files[0];
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    avatar.value = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                const formData = new FormData();
+                formData.append("file", file);
+                try {
+                    await axios.post("http://localhost:5000/upload_avatar", formData, {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                        params:
+                            { owner_id: 1 } // TODO:修改为个人信息ID
+                    });
+                    avatar_url.value = URL.createObjectURL(file);
+                    // avatar_url.value = response.data.avatar_url;
+                    alert("头像上传成功");
+                } catch (error) {
+                    console.error(error);
+                    alert("头像上传失败，请重试");
+                }
             }
         };
+
+
+        // 从后端获取初始数据
+        const fetchData = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/myapi/info",
+                    {
+                        params:
+                            { is_owner: 0 } //用户个人信息
+                    });
+                const data = response.data;
+                owner_id.value = data.owner_id;
+                username.value = data.username;
+                phone.value = data.phone;
+                address.value = data.address;
+                email.value = data.email;
+                communityName.value = data.communityName;
+                buildingNumber.value = data.buildingNumber;
+                unitNumber.value = data.unitNumber;
+                doorNumber.value = data.doorNumber;
+                parkingNumber.value = data.parkingNumber;
+                securityCardNumber.value = data.securityCardNumber;
+                emergencyContact.value = data.emergencyContact;
+                emergencyContactPhone.value = data.emergencyContactPhone;
+                avatar_url.value = data.avatar_url;
+            } catch (error) {
+                console.error(error);
+            }
+        };
+        // 在组件挂载时从后端获取数据
+        onMounted(fetchData);//生命周期钩子，在组件挂载时调用 fetchData 函数，以便在页面加载时自动获取数据。
 
         return {
             size,
             fileInput,
             editing,
-            avatar,
             defaultAvatar,
+            owner_id,
             username,
             phone,
             address,
@@ -117,6 +186,7 @@ export default {
             emergencyContactPhone,
             editProfile,
             uploadImage,
+            avatar_url,
         };
 
     },
@@ -140,20 +210,21 @@ export default {
 }
 
 .avatar {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 20px;
 }
 
 .table_user {
-    width: 75%; //100%
+    max-width: 75%;
     margin-bottom: 20px;
-    margin-left: 200px;
-    margin-right: 200px;
-    font-size: 2.0em;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 2.0rem;
 }
+
 
 
 .action-btn {

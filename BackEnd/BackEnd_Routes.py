@@ -39,6 +39,7 @@ def get_db_connection():
     return db
 
 
+# 数据库
 mydb = get_db_connection()
 
 
@@ -55,18 +56,45 @@ def teardown_request(exception):
 
 
 # ----------------数据库表操作--------------------#
+# 业主信息管理——获取所有业主用户名
+@app.route('/myapi/owners', methods=['GET'])
+def get_all_owners():
+    cursor = g.db.cursor()
+    query = """
+        SELECT id, username
+        FROM personal_info
+    """
+    cursor.execute(query)
+
+    result = cursor.fetchall()
+    cursor.close()
+
+    owners = []
+    if result:
+        for row in result:
+            owners.append({
+                'id': row['id'],
+                'username': row['username']
+            })
+    return jsonify(owners)
+
 
 # -----个人信息(业主信息）管理部分------#
-
-@app.route('/myapi/personal_info', methods=['GET'])
-def get_personal_info(select_sql=None):
+def get_personal_info_by_id(owner_id):
     cursor = g.db.cursor()
-    cursor.execute("SELECT * FROM personal_info WHERE id = 1")
+    query = """
+        SELECT *
+        FROM personal_info
+        WHERE id = %s
+    """
+    cursor.execute(query, (owner_id,))
+
     result = cursor.fetchone()
     cursor.close()
 
     if result:
         personal_info = {
+            'owner_id': owner_id,
             'username': result['username'],
             'phone': result['phone'],
             'address': result['address'],
@@ -78,10 +106,12 @@ def get_personal_info(select_sql=None):
             'parkingNumber': result['parking_number'],
             'securityCardNumber': result['security_card_number'],
             'emergencyContact': result['emergency_contact'],
-            'emergencyContactPhone': result['emergency_contact_phone']
+            'emergencyContactPhone': result['emergency_contact_phone'],
+            'avatar_url': result['avatar_url']
         }
     else:
         personal_info = {
+            'owner_id': '',
             'username': '',
             'phone': '',
             'address': '',
@@ -93,13 +123,27 @@ def get_personal_info(select_sql=None):
             'parkingNumber': '',
             'securityCardNumber': '',
             'emergencyContact': '',
-            'emergencyContactPhone': ''
+            'emergencyContactPhone': '',
+            'avatar_url': '../../assets/images/userpic.jpg'
         }
     return jsonify(personal_info)
 
 
+@app.route('/myapi/info', methods=['GET'])
+def get_info():
+    # is_owner = request.args.get('is_owner', 0, type=int)
+    # print(is_owner)
+    owner_id = request.args.get('owner_id', None, type=int)  # 获取owner_id参数
+    print(owner_id)
+
+    if owner_id is None:
+        print("no owner_id!")
+        owner_id = 1  # TODO:get_current_logged_in_user_id()
+    return get_personal_info_by_id(owner_id)
+
+
 # 由前端调用自动更新
-@app.route('/myapi/personal_info', methods=['PUT'])
+@app.route('/myapi/info_update', methods=['PUT'])
 def update_personal_info():
     data = request.get_json()
 
@@ -119,10 +163,11 @@ def update_personal_info():
                 parking_number=%s,
                 security_card_number=%s,
                 emergency_contact=%s,
-                emergency_contact_phone=%s
-            WHERE id = 1
+                emergency_contact_phone=%s,
+                avatar_url=%s
+            WHERE id = %s
         """
-    print("Executing SQL:", sql)  # Print generated SQL
+    # print("Executing SQL:", sql)  # Print generated SQL
 
     cursor.execute(sql, (
         data['username'],
@@ -136,7 +181,9 @@ def update_personal_info():
         data['parkingNumber'],
         data['securityCardNumber'],
         data['emergencyContact'],
-        data['emergencyContactPhone']
+        data['emergencyContactPhone'],
+        data['avatar_url'],
+        data['owner_id'],  # Add this line
     ))
     g.db.commit()
     cursor.close()
@@ -146,6 +193,9 @@ def update_personal_info():
 
 @app.route('/upload_avatar', methods=['POST'])
 def upload_avatar():
+    owner_id = request.args.get('owner_id', None, type=int)  # 获取owner_id参数
+    print("upload_avatar_owner_id:", owner_id)
+
     if 'file' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
 
@@ -159,11 +209,12 @@ def upload_avatar():
         myfile.save(os.path.join(app.config['UPLOAD_IMAGE_FOLDER'], filename))
         # 更新数据库中的头像 URL
         cursor = g.db.cursor()
-        cursor.execute("""
+        sql = """
             UPDATE personal_info SET
                 avatar_url=%s
-            WHERE id = 1
-        """, (os.path.join(app.config['UPLOAD_IMAGE_FOLDER'], filename)))
+            WHERE id = %s
+        """
+        cursor.execute(sql, (os.path.join(app.config['UPLOAD_IMAGE_FOLDER'], filename), owner_id))
         g.db.commit()
         cursor.close()
         return jsonify({"message": "Avatar uploaded successfully"}), 200
@@ -181,9 +232,9 @@ def insert_personal_info(db, data):
         INSERT INTO personal_info (
             username, phone, address, email, community_name, building_number,
             unit_number, door_number, parking_number, security_card_number,
-            emergency_contact, emergency_contact_phone
+            emergency_contact, emergency_contact_phone,avatar_url
         )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,%s)
     """
     cursor.executemany(sql, data)
     db.commit()
@@ -223,7 +274,6 @@ if __name__ == '__main__':
         os.makedirs(app.config['UPLOAD_FILE_FOLDER'])  # 如果上传文件夹不存在，则创建
     if not os.path.exists(app.config['UPLOAD_IMAGE_FOLDER']):
         os.makedirs(app.config['UPLOAD_IMAGE_FOLDER'])
-
 
     # test_data = [
     #     ("张三", "13800138000", "上海市虹口区XX路XX号", "zhangsan@example.com", "阳光花园", "5栋", "2单元", "502室", "B-102", "AF-123456",
