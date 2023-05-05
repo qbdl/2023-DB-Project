@@ -69,6 +69,14 @@ const login = (formEl: FormInstance | undefined) => {
 			const { data } = await loginApi({ ...loginForm, password: md5(loginForm.password) });
 			globalStore.setToken(data.access_token);
 
+			//增加来使得userInfo.roles不为空，原来是mock数据没有userInfo
+			if (loginForm.username == 'user') {
+				globalStore.userInfo.roles = ['user'];
+			}
+			else {
+				globalStore.userInfo.roles = ['admin'];
+			}
+
 			// 2.添加动态路由
 			await initDynamicRouter();
 
@@ -108,4 +116,6 @@ onMounted(() => {
 });
 </script>
 
-<style scoped lang="scss">@import "../index.scss";</style>
+<style scoped lang="scss">
+@import "../index.scss";
+</style>

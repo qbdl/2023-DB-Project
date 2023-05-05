@@ -89,7 +89,8 @@
 				"isHide": false,
 				"isFull": false,
 				"isAffix": false,
-				"isKeepAlive": true
+				"isKeepAlive": true,
+				"roles":["admin","user"]
 			},
 			"children": [
 				{
@@ -135,7 +136,8 @@
 				"isHide": false,
 				"isFull": false,
 				"isAffix": false,
-				"isKeepAlive": true
+				"isKeepAlive": true,
+				"roles":["admin","user"]
 			},
 			"children": [
 				{
@@ -241,7 +243,8 @@
 				"isHide": false,
 				"isFull": false,
 				"isAffix": false,
-				"isKeepAlive": true
+				"isKeepAlive": true,
+				"roles":["admin","user"]
 			},
 			"children": [
 				{
@@ -255,7 +258,8 @@
 						"isHide": false,
 						"isFull": false,
 						"isAffix": false,
-						"isKeepAlive": true
+						"isKeepAlive": true,
+						"roles":["admin","user"]
 					}
 				}
 			]

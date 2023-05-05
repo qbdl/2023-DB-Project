@@ -1,9 +1,10 @@
-import { Login } from "@/api/interface/index";
+import { Login, ResultData } from "@/api/interface/index";
 import { PORT1 } from "@/api/config/servicePort";
 import DynamicRouter from "@/assets/json/dynamicRouter.json";
 import AuthButtons from "@/assets/json/authButtons.json";
 import qs from "qs";
 import http from "@/api";
+import { GlobalStore } from "@/stores";
 
 /**
  * @name 登录模块
@@ -21,17 +22,50 @@ export const loginApi = (params: Login.ReqLoginForm) => {
 export const getAuthButtonListApi = () => {
 	return http.get<Login.ResAuthButtons>(PORT1 + `/auth/buttons`, {}, { headers: { noLoading: true } });
 	// 如果想让按钮权限变为本地数据，注释上一行代码，并引入本地 authButtons.json 数据
+
 	return AuthButtons;
+};
+
+//判断权限
+export const hasPermission = (route: any, roles: Array<string>) => {
+	// if (route.children && route.children.length > 0) {
+	// 	return true;
+	// }
+	if (route.meta && route.meta.roles) {
+		return roles.some(role => route.meta.roles.includes(role));
+	} else {
+		return false;
+	}
+};
+
+//根据权限筛选
+export const filterAsyncRoutes = (routes: Array<any>, roles: Array<string>) => {
+	console.log("routes = ", routes, "roles = ", roles);
+	const res: Array<any> = [];
+	routes.forEach(route => {
+		const temp = { ...route };
+		if (hasPermission(temp, roles)) {
+			if (temp.children) {
+				temp.children = filterAsyncRoutes(temp.children, roles);
+			}
+			res.push(temp);
+		}
+	});
+	return res;
 };
 
 // * 获取菜单列表
 export const getAuthMenuListApi = () => {
 	// return http.get<Menu.MenuOptions[]>(PORT1 + `/menu/list`, {}, { headers: { noLoading: true } });
 	// 如果想让菜单变为本地数据，注释上一行代码，并引入本地 dynamicRouter.json 数据
-
-	// 根据后端返回的roles来过滤
-	// 对DynamicRouter筛选后再返回
-
+	// 动态过滤路由，根据meta项的roles属性过滤，roles项设置在最底层子路由上
+	return new Promise<ResultData<Menu.MenuOptions[]>>(resolve => {
+		const globalStore = GlobalStore();
+		const accessRoutes = filterAsyncRoutes(DynamicRouter.data, globalStore.userInfo?.roles);
+		console.log("userInfo = ", globalStore.userInfo);
+		resolve({ code: "200", data: accessRoutes, msg: "success" });
+		console.log({ accessRoutes });
+	});
 	return DynamicRouter;
 };
 

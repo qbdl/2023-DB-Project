@@ -13,7 +13,9 @@ export const GlobalStore = defineStore({
 		// token
 		token: "",
 		// userInfo
-		userInfo: "",
+		userInfo: {
+			roles: []
+		},
 		// element组件大小
 		assemblySize: "default",
 		// language

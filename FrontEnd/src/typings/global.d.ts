@@ -17,6 +17,7 @@ declare namespace Menu {
 		isFull: boolean;
 		isAffix: boolean;
 		isKeepAlive: boolean;
+		roles: string[];
 	}
 }
 
