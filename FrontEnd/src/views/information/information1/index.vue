@@ -25,55 +25,14 @@
 		</el-dialog>
 	</div>
 </template>
-  
+
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
+
 export default {
 	setup() {
-		let tableData = [
-  {
-    id: "001",
-    title: "关于增加小区门禁卡的通知",
-    date: "2023-04-01",
-    author: "物业管理部",
-    status: "已发布",
-    content: "为了提高小区的安全性，我们将会增加小区门禁卡的数量...",
-  },
-  {
-    id: "002",
-    title: "关于升级小区监控系统的通知",
-    date: "2023-04-05",
-    author: "物业管理部",
-    status: "已发布",
-    content: "为了提高小区安全管理水平，我们将对小区内的监控系统进行升级...",
-  },
-  {
-    id: "003",
-    title: "关于严禁闲杂人员进入小区的通知",
-    date: "2023-04-10",
-    author: "物业管理部",
-    status: "已发布",
-    content: "为了维护小区居民的生活安全，我们将严格执行门禁管理，严禁闲杂人员进入小区...",
-  },
-  {
-    id: "004",
-    title: "关于加强小区夜间巡逻安保的通知",
-    date: "2023-04-15",
-    author: "物业管理部",
-    status: "已发布",
-    content: "为了确保小区居民的安全，我们将在夜间加强巡逻安保工作，请各位居民注意安全...",
-  },
-  {
-    id: "005",
-    title: "关于防范入室盗窃的安全提示",
-    date: "2023-04-20",
-    author: "物业管理部",
-    status: "已发布",
-    content: "近期发生一些入室盗窃案件，请广大居民提高防范意识，加强门窗安全，外出时请确保房屋安全...",
-  },
-];
-
-
+		const tableData = ref([]);
 		const dialogVisible = ref(false);
 		const selectedAnnouncement = ref(null);
 
@@ -86,6 +45,20 @@ export default {
 			done();
 		};
 
+		const fetchAnnouncements = async () => {
+			try {
+				const response = await axios.get("http://localhost:5000/myapi/announcements");
+				console.log(response);
+				const data = response.data;
+				tableData.value = data;
+			} catch (error) {
+				console.error(error);
+			}
+		};
+
+
+		onMounted(fetchAnnouncements);
+
 		return {
 			tableData,
 			dialogVisible,
@@ -96,6 +69,7 @@ export default {
 	},
 };
 </script>
+
   
 <style scoped>
 .card {

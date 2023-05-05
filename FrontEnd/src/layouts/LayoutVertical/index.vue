@@ -5,19 +5,12 @@
 			<div class="menu" :style="{ width: isCollapse ? '65px' : '210px' }">
 				<div class="logo flx-center">
 					<img src="@/assets/images/logo.svg" alt="logo" />
-					<span v-show="!isCollapse">Geeker Admin</span>
+					<span v-show="!isCollapse">ISC</span>
 				</div>
 				<el-scrollbar>
-					<el-menu
-						:default-active="activeMenu"
-						:router="false"
-						:collapse="isCollapse"
-						:collapse-transition="false"
-						:unique-opened="true"
-						background-color="#191a20"
-						text-color="#bdbdc0"
-						active-text-color="#ffffff"
-					>
+					<el-menu :default-active="activeMenu" :router="false" :collapse="isCollapse"
+						:collapse-transition="false" :unique-opened="true" background-color="#191a20" text-color="#bdbdc0"
+						active-text-color="#ffffff">
 						<SubMenu :menuList="menuList" />
 					</el-menu>
 				</el-scrollbar>
@@ -57,11 +50,13 @@ const isCollapse = computed(() => globalStore.themeConfig.isCollapse);
 
 <style lang="scss">
 .vertical {
+
 	.el-menu,
 	.el-menu--popup {
 		.el-menu-item {
 			&.is-active {
 				background: #060708;
+
 				&::before {
 					position: absolute;
 					top: 0;

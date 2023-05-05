@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div class="out-div">
 		<h1 class="header">文件上传</h1>
 		<div class="main-container">
 			<div class="upload-container">
@@ -9,8 +9,10 @@
 					:multiple="true" :limit="3" :on-exceed="handleExceed">
 					<div class="button-wrapper">
 						<el-button size="Large" type="primary">点击上传</el-button>
-						<div slot="tip" class="el-upload__tip" size="100">
-							支持的文件类型：.xlsx, .xls, .csv, .doc, .docx
+						<!-- 添加预览按钮 -->
+						<!-- <el-button size="Large" type="warning" @click="handlePreview(selectedFile)">预览文件</el-button> -->
+						<div slot="tip" class="el-upload__tip" size="large">
+							支持的文件类型：.xlsx, .xls, .csv, .doc, .docx, .pdf
 						</div>
 					</div>
 				</el-upload>
@@ -21,23 +23,22 @@
 		</div>
 	</div>
 </template>
-
 <script>
 import { ref } from "vue";
 import { ElMessage, ElMessageBox } from 'element-plus';
-import FilePreview from "./FilePreview.vue"; // 请确保您已经创建了该组件
+import FilePreview from "./FilePreview.vue";
 
 export default {
 	components: {
 		FilePreview,
 	},
 	setup() {
+		const selectedFile = ref(null); // 添加 selectedFile 数据属性
 		const uploadUrl = "http://localhost:5000/upload"; // 替换为你的上传API URL
 		const fileList = ref([]);
-		const selectedFile = ref(null);
 
 		const beforeUpload = (file) => {
-			const allowedExtensions = ["xlsx", "xls", "csv", "doc", "docx"];
+			const allowedExtensions = ["xlsx", "xls", "csv", "doc", "docx", "pdf"];
 			const fileExtension = file.name.split(".").pop().toLowerCase();
 
 			if (!allowedExtensions.includes(fileExtension)) {
@@ -95,12 +96,25 @@ export default {
 
 
 <style scoped>
+.out-div {
+	background-image: url("@/assets/images/background.png");
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	background-color: #f8f8f8;
+	padding: 20px;
+	border-radius: 15px;
+
+	background-size: cover;
+}
+
 .header {
 	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	margin-bottom: 20px;
+
 }
 
 .main-container {
@@ -116,8 +130,10 @@ export default {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	align-items: center;
-	background-color: #ffffff;
+	/* background-color: #ffffff; */
+	background-color: rgba(255, 255, 255, 0.8);
 	padding: 20px;
 	border-radius: 15px;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -125,15 +141,16 @@ export default {
 
 .button-wrapper {
 	position: absolute;
-	/* 使用绝对定位将按钮和提示文本固定在底部 */
 	bottom: 20px;
-	/* 设置底部的距离 */
 	width: 100%;
-	/* 设置宽度以使元素占据整个容器宽度 */
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	/* size: 100px; */
+}
+
+.el-upload__tip {
+	text-align: center;
+	margin-top: 20px;
 }
 
 .preview-container {
@@ -141,7 +158,8 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
-	background-color: #ffffff;
+	/* background-color: #ffffff; */
+	background-color: rgba(255, 255, 255, 0.8);
 	padding: 20px;
 	border-radius: 15px;
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

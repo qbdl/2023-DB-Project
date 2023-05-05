@@ -4,6 +4,8 @@ from flask import g  # g对象在请求上下文中存储数据库连接
 import pymysql
 import os
 import sys
+import time
+from werkzeug.datastructures import FileStorage
 
 sys.path.append("C:/Users/likejie/AppData/Local/Programs/Python/Python39/Lib/site-packages")
 from flask_cors import CORS
@@ -15,7 +17,7 @@ CORS(app, resources={r'/*': {'origins': '*'}}, supports_credentials=True)  # 解
 
 app.config['UPLOAD_FILE_FOLDER'] = './uploads/files'  # 设置上传文件的文件夹路径
 app.config['UPLOAD_IMAGE_FOLDER'] = './uploads/images'  # 设置上传图片的文件夹路径
-app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls', 'csv', 'doc', 'docx', 'jpg', 'jpeg', 'png'}  # 设置允许的文件类型
+app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls', 'csv', 'doc', 'docx', 'jpg', 'jpeg', 'png','pdf'}  # 设置允许的文件类型
 
 # ----------------数据库配置--------------------#
 #  MySQL 数据库的实际信息
@@ -228,11 +230,43 @@ def upload_avatar():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
+
+def upload_save_file(file: FileStorage, path: str):
+    file_ext = file.filename.rsplit('.', 1)[1].lower()
+    timestamp = int(time.time())
+    new_filename = f"{timestamp}_{file.filename}"
+    file.save(os.path.join(path, new_filename))
+    return new_filename
+
+
+# 上传文件
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part in the request"}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    if file and allowed_file(file.filename):
+        new_filename = upload_save_file(file, app.config['UPLOAD_FILE_FOLDER'])
+        return jsonify({"success": f"File uploaded and saved as {new_filename}"}), 200
+    else:
+        return jsonify({"error": "Unsupported file type"}), 400
+
+
 # ---------------------------------------------------------------#
 
-# -----------------车辆信息部分-----------------#
+# -----------------车辆信息部分(没用上）-----------------#
+@app.route('/test', methods=['POST'])
+def my_test():
+    data = request.get_json()
+    print("received this time:", data)
+
+
 # 获取用户列表
-@app.route('/user/list', methods=['POST'])
+@app.route('/getUserList', methods=['POST'])
 def get_user_list():
     data = request.get_json()
     page = data.get("page", 1)
@@ -351,6 +385,37 @@ def change_user_status():
     g.db.commit()
     cursor.close()
     return jsonify({"message": "User status updated successfully"})
+
+
+# ------------------小区安防公告-------------------------------------#
+# 接受安防公告
+@app.route('/myapi/announcements', methods=['GET'])
+def get_announcements():
+    cursor = g.db.cursor()
+    cursor.execute("SELECT * FROM security_announcements")
+    announcements = cursor.fetchall()
+    cursor.close()
+    return jsonify(announcements)
+
+
+# 发布安防公告
+@app.route('/myapi/create_announcement', methods=['POST'])
+def create_announcement():
+    announcement = request.json
+    id = announcement['id']
+    title = announcement['title']
+    date = announcement['date']
+    author = announcement['author']
+    status = announcement['status']
+    content = announcement['content']
+
+    cursor = g.db.cursor()
+    cursor.execute(
+        "INSERT INTO security_announcements (id, title, date, author, status, content) VALUES (%s, %s, %s, %s, %s, %s)",
+        (id, title, date, author, status, content))
+    g.db.commit()
+
+    return jsonify({"message": "Announcement created successfully"}), 201
 
 
 #

@@ -1,55 +1,57 @@
 <template>
-    <div class="card">
-        <div class="header">
-            <h2>个人信息管理</h2>
-        </div>
-        <!-- Add avatar container and input for uploading image -->
-        <div class="avatar-container">
-            <img :src="defaultAvatar || avatar_url" class="avatar">
-            <input v-if="editing" type="file" @change="uploadImage" ref="fileInput">
-        </div>
+    <div class="main-container">
+        <div class="card">
+            <div class="header">
+                <h2>个人信息管理</h2>
+            </div>
+            <!-- Add avatar container and input for uploading image -->
+            <div class="avatar-container">
+                <img :src="defaultAvatar || avatar_url" class="avatar">
+                <input v-if="editing" type="file" @change="uploadImage" ref="fileInput">
+            </div>
 
-        <!-- 描述性列表 -->
-        <el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" :size="Large" border>
-            <el-descriptions-item label="用户名">
-                <el-input v-model="username" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="电话">
-                <el-input v-model="phone" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="地址" :span="2">
-                <el-input v-model="address" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="邮箱">
-                <el-input v-model="email" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="小区名称">
-                <el-input v-model="communityName" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="楼栋号">
-                <el-input v-model="buildingNumber" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="单元号">
-                <el-input v-model="unitNumber" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="门牌号">
-                <el-input v-model="doorNumber" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="车位号">
-                <el-input v-model="parkingNumber" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="安防卡号">
-                <el-input v-model="securityCardNumber" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="紧急联系人">
-                <el-input v-model="emergencyContact" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-            <el-descriptions-item label="紧急联系电话">
-                <el-input v-model="emergencyContactPhone" :disabled="!editing"></el-input>
-            </el-descriptions-item>
-        </el-descriptions>
+            <!-- 描述性列表 -->
+            <el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" :size="Large" border>
+                <el-descriptions-item label="用户名">
+                    <el-input v-model="username" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="电话">
+                    <el-input v-model="phone" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="地址" :span="2">
+                    <el-input v-model="address" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="邮箱">
+                    <el-input v-model="email" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="小区名称">
+                    <el-input v-model="communityName" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="楼栋号">
+                    <el-input v-model="buildingNumber" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="单元号">
+                    <el-input v-model="unitNumber" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="门牌号">
+                    <el-input v-model="doorNumber" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="车位号">
+                    <el-input v-model="parkingNumber" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="安防卡号">
+                    <el-input v-model="securityCardNumber" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="紧急联系人">
+                    <el-input v-model="emergencyContact" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="紧急联系电话">
+                    <el-input v-model="emergencyContactPhone" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+            </el-descriptions>
 
-        <el-button @click="editProfile" class="action-btn">{{ editing ? '保存' : '编辑个人信息' }}</el-button>
+            <el-button @click="editProfile" class="action-btn">{{ editing ? '保存' : '编辑个人信息' }}</el-button>
+        </div>
     </div>
 </template>
 
@@ -103,10 +105,10 @@ export default {
                 //传回给后端数据库
                 try {
                     await axios.put("http://localhost:5000/myapi/info_update", data);
-                    alert("个人信息更新成功");
+                    ElMessage({ message: "个人信息更新成功", type: "success" });
                 } catch (error) {
                     console.error(error);
-                    alert("个人信息更新失败，请重试");
+                    ElMessage({ message: "个人信息更新失败，请重试", type: "error" });
                 }
             }
         };
@@ -127,10 +129,10 @@ export default {
                     });
                     avatar_url.value = URL.createObjectURL(file);
                     // avatar_url.value = response.data.avatar_url;
-                    alert("头像上传成功");
+                    ElMessage({ message: "头像上传成功", type: "success" });
                 } catch (error) {
                     console.error(error);
-                    alert("头像上传失败，请重试");
+                    ElMessage({ message: "头像上传失败，请重试", type: "error" });
                 }
             }
         };
@@ -194,8 +196,23 @@ export default {
 </script>
 
 <style scoped lang="scss">
+.main-container {
+    background-image: url("@/assets/images/background.png");
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 15px;
+
+    background-size: cover;
+
+}
+
 .card {
-    width: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 80%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -210,21 +227,17 @@ export default {
 }
 
 .avatar {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
     object-fit: cover;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .table_user {
-    max-width: 75%;
+    width: 85%;
     margin-bottom: 20px;
-    margin-left: auto;
-    margin-right: auto;
-    font-size: 2.0rem;
 }
-
 
 
 .action-btn {

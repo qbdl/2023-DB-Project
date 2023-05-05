@@ -1,18 +1,24 @@
 <template>
 	<el-dropdown trigger="click">
 		<div class="avatar">
-			<img src="@/assets/images/avatar.gif" alt="avatar" />
+			<img src="@/assets/images/designer.gif" alt="avatar" />
 		</div>
 		<template #dropdown>
 			<el-dropdown-menu>
 				<el-dropdown-item @click="openDialog('infoRef')">
-					<el-icon><User /></el-icon>{{ $t("header.personalData") }}
+					<el-icon>
+						<User />
+					</el-icon>{{ $t("header.personalData") }}
 				</el-dropdown-item>
 				<el-dropdown-item @click="openDialog('passwordRef')">
-					<el-icon><Edit /></el-icon>{{ $t("header.changePassword") }}
+					<el-icon>
+						<Edit />
+					</el-icon>{{ $t("header.changePassword") }}
 				</el-dropdown-item>
 				<el-dropdown-item @click="logout" divided>
-					<el-icon><SwitchButton /></el-icon>{{ $t("header.logout") }}
+					<el-icon>
+						<SwitchButton />
+					</el-icon>{{ $t("header.logout") }}
 				</el-dropdown-item>
 			</el-dropdown-menu>
 		</template>
@@ -67,11 +73,12 @@ const openDialog = (refName: string) => {
 
 <style scoped lang="scss">
 .avatar {
-	width: 40px;
-	height: 40px;
+	width: 160px;
+	height: 90px;
 	overflow: hidden;
 	cursor: pointer;
 	border-radius: 50%;
+
 	img {
 		width: 100%;
 		height: 100%;

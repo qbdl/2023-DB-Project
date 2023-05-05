@@ -174,21 +174,15 @@ export default {
 
 <style scoped>
 .wrapper {
-    /*渐变的背景色*/
-    /*height: 100vh;
-  background-image: linear-gradient(to bottom right, #FC466B, #3F5EF8);
-  overflow: hidden;*/
-    /*背景图*/
-    /* background: url('../../assets/images/userpic.jpg'); */
     background-size: 100% 100%;
     width: 100%;
     height: 100%;
     /**宽高100%是为了图片铺满屏幕 */
     z-index: -1;
-    /* position: absolute; */
 }
 
 .main-container {
+    background-image: url("@/assets/images/background.png");
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -196,6 +190,8 @@ export default {
     background-color: #f8f8f8;
     padding: 20px;
     border-radius: 15px;
+
+    background-size: cover;
 
 }
 
@@ -216,14 +212,16 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.8);
+    /* 修改背景颜色，添加透明度 */
+    /* background-color: #ffffff; */
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .video-style {
-    height: 500px;
+    height: 400px;
     width: 500px;
     border-radius: 10px;
 }

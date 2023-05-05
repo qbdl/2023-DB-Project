@@ -11,7 +11,7 @@
                 </div>
                 <div class="buttons">
                     <el-upload class="upload-demo" action="" :auto-upload="false" :on-change="handleImageChange">
-                        <el-button size="small" type="primary">选择图片</el-button>
+                        <el-button size="mid" type="primary">选择图片</el-button>
                     </el-upload>
                     <el-button @click="recognizeVehicle">识别车辆</el-button>
                 </div>
@@ -57,12 +57,15 @@ export default {
   
 <style scoped>
 .wrapper {
+    /* background-image: url("@/assets/images/background.png"); */
     width: 100%;
     height: 100%;
     z-index: -1;
 }
 
 .main-container {
+    background-image: url("@/assets/images/background.png");
+    /* background-image: url("@/assets/images/welcome_ori.png"); */
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -70,6 +73,12 @@ export default {
     background-color: #f8f8f8;
     padding: 20px;
     border-radius: 15px;
+
+    /* 新增属性 */
+    background-size: cover;
+    /* 缩放图片以完全覆盖容器，保持图片比例 */
+    /* background-position: center; */
+    /* 将图片居中显示 */
 }
 
 .header {
@@ -89,19 +98,21 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #ffffff;
+    /* background-color: #ffffff; */
+    background-color: rgba(255, 255, 255, 0.6);
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .image-container {
-    height: 500px;
+    height: 400px;
     width: 500px;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #f0f0f0;
+    /* background-color: #f0f0f0; */
+    background-color: rgba(255, 255, 255, 0.8);
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 20px;

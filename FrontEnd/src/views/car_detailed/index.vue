@@ -1,27 +1,17 @@
 <template>
 	<div class="main-box">
-		<TreeFilter
-			label="name"
-			title="部门列表(单选)"
-			:requestApi="getUserDepartment"
-			:defaultValue="initParam.departmentId"
-			@change="changeTreeFilter"
-		/>
+		<!-- <TreeFilter label="name" title="部门列表(单选)" :requestApi="getUserDepartment" :defaultValue="initParam.departmentId"
+			@change="changeTreeFilter" /> -->
 		<div class="table-box">
-			<ProTable
-				ref="proTable"
-				title="用户列表"
-				:columns="columns"
-				:requestApi="getUserList"
-				:initParam="initParam"
-				:searchCol="{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }"
-			>
+			<!-- <ProTable ref="proTable" title="用户列表" :columns="columns" :requestApi="getUserList" :initParam="initParam" -->
+			<ProTable ref="proTable" title="用户列表" :columns="columns" :requestApi="getUserList" :initParam="initParam"
+				:searchCol="{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }">
 				<!-- 表格 header 按钮 -->
 				<template #tableHeader>
 					<el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增用户</el-button>
 					<el-button type="primary" :icon="Upload" plain @click="batchAdd">批量添加用户</el-button>
-					<el-button type="primary" :icon="Download" plain @click="downloadFile">导出用户数据</el-button>
-					<el-button type="primary" plain @click="toDetail">To 平级详情页面</el-button>
+					<!-- <el-button type="primary" :icon="Download" plain @click="downloadFile">导出用户数据</el-button> -->
+					<!-- <el-button type="primary" plain @click="toDetail">To 平级详情页面</el-button> -->
 				</template>
 				<!-- 表格操作 -->
 				<template #operation="scope">
@@ -38,6 +28,7 @@
 </template>
 <script setup lang="ts" name="useTreeFilter">
 import { ref, reactive } from "vue";
+import axios from "axios";
 import { User } from "@/api/interface";
 import { useRouter } from "vue-router";
 import { ElMessage, ElMessageBox } from "element-plus";
@@ -63,6 +54,33 @@ import {
 } from "@/api/modules/user";
 
 const router = useRouter();
+
+//lkj add here
+const API_BASE_URL = "http://localhost:5000";
+const my_user_list_api = "http://localhost:5000/getUserList";
+async function my_getUserList(params) {
+	try {
+		// 修改 API 请求地址和参数格式
+		const response = await axios.post('http://localhost:5000/getUserList', params);
+
+		// 确保数据格式正确
+		if (response.data && response.data.data && Array.isArray(response.data.data.list)) {
+			return {
+				data: response.data.data.list,
+				total: response.data.data.total,
+			};
+		} else {
+			throw new Error('数据格式不正确');
+		}
+	} catch (error) {
+		console.error('获取用户列表失败:', error.message);
+		return {
+			data: [],
+			total: 0,
+		};
+	}
+}
+
 
 // 跳转详情页
 const toDetail = () => {

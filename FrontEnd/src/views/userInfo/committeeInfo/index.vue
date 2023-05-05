@@ -8,14 +8,14 @@
         <div class="right-panel">
             <div class="owner-card" v-if="selectedOwner">
                 <div class="header">
-                    <h2>{{ selectedOwner.name }}</h2>
+                    <h2>{{ selectedOwner.username }}</h2>
                 </div>
                 <!-- Add avatar container and input for uploading image -->
                 <div class="avatar-container">
                     <img :src="defaultAvatar || selectedOwner.avatar_url" class="avatar">
                     <input v-if="editing" type="file" @change="uploadImage" ref="fileInput">
                 </div>
-                <el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" :size="'large'" border>
+                <el-descriptions class="table_user" title="业主具体信息" direction="vertical" :column="2" :size="large" border>
                     <el-descriptions-item label="用户名">
                         <el-input v-model="selectedOwner.username" :disabled="!editing"></el-input>
                     </el-descriptions-item>
@@ -87,7 +87,7 @@ export default {
                 console.log("getOwners data:", response.data);
             } catch (error) {
                 console.error(error);
-                alert("无法获取业主信息，请重试");
+                ElMessage({ message: "无法获取业主信息，请重试", type: "error" });
             }
         };
 
@@ -122,10 +122,10 @@ export default {
                             'Content-Type': 'application/json'
                         }
                     });
-                    alert("业主信息更新成功");
+                    ElMessage({ message: "业主信息更新成功", type: "success" });
                 } catch (error) {
                     console.error(error);
-                    alert("业主信息更新失败，请重试");
+                    ElMessage({ message: "业主信息更新失败，请重试", type: "error" });
                 }
             }
         };
@@ -163,18 +163,6 @@ export default {
             defaultAvatar,
             editing,
 
-            // username,
-            // phone,
-            // address,
-            // email,
-            // communityName,
-            // buildingNumber,
-            // unitNumber,
-            // doorNumber,
-            // parkingNumber,
-            // securityCardNumber,
-            // emergencyContact,
-            // emergencyContactPhone,
             avatar_url,
 
             owners,
@@ -189,6 +177,15 @@ export default {
   
 <style scoped lang="scss">
 .main-container {
+    background-image: url("@/assets/images/background.png");
+    z-index: 1;
+    // align-items: center;
+    background-color: #f8f8f8;
+    padding: 20px;
+    border-radius: 15px;
+
+    background-size: cover;
+
     display: flex;
     flex-direction: row;
 }
@@ -199,6 +196,8 @@ export default {
 }
 
 .right-panel {
+    background-color: rgba(255, 255, 255, 0.8);
+    ;
     width: 80%;
     padding: 20px;
 }
@@ -210,8 +209,8 @@ export default {
 }
 
 .avatar {
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 10px;
@@ -229,11 +228,11 @@ export default {
 .header {
     width: 100%;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .avatar-container {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 .table_user {
