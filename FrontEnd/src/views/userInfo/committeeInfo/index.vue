@@ -62,6 +62,7 @@
 <script lang="js">
 import { ref, onMounted } from "vue";
 import axios from "axios"; // 导入 axios 库——用于向后端发出 HTTP 请求，以获取和发送数据
+import { ElMessage } from "element-plus";
 
 export default {
     name: "ownerInfo",
