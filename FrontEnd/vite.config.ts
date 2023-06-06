@@ -7,7 +7,6 @@ import { visualizer } from "rollup-plugin-visualizer";
 import { createSvgIconsPlugin } from "vite-plugin-svg-icons";
 import viteCompression from "vite-plugin-compression";
 import vueSetupExtend from "vite-plugin-vue-setup-extend-plus";
-import eslintPlugin from "vite-plugin-eslint";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import importToCDN from "vite-plugin-cdn-import";
 // import AutoImport from "unplugin-auto-import/vite";
@@ -64,8 +63,6 @@ export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
 				iconDirs: [resolve(process.cwd(), "src/assets/icons")],
 				symbolId: "icon-[dir]-[name]"
 			}),
-			// * EsLint 报错信息显示在浏览器界面上
-			eslintPlugin(),
 			// * vite 可以使用 jsx/tsx 语法
 			vueJsx(),
 			// * name 可以写在 script 标签上
