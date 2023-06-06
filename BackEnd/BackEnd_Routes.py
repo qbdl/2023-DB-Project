@@ -7,7 +7,7 @@ import sys
 import time
 from werkzeug.datastructures import FileStorage
 
-sys.path.append("C:/Users/likejie/AppData/Local/Programs/Python/Python39/Lib/site-packages")
+# sys.path.append("C:/Users/likejie/AppData/Local/Programs/Python/Python39/Lib/site-packages")
 from flask_cors import CORS
 
 # Global Variables
