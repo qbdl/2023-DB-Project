@@ -2,7 +2,8 @@ import { ResPage, User } from "@/api/interface/index";
 import http from "@/api";
 // import axios from "axios";
 
-const PORT1 = "/geeker";
+// const PORT1 = "/geeker";
+const PORT1 = "";
 
 // const interface ResUserList {
 // 	id: string;

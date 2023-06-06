@@ -3,7 +3,7 @@
 	<Tabs v-if="themeConfig.tabs" />
 	<el-main>
 		<router-view v-slot="{ Component, route }">
-			<transition appear name="fade-transform" mode="out-in">
+			<transition appear name="fade-transform">
 				<keep-alive :include="keepAliveStore.keepAliveName">
 					<component :is="Component" :key="route.path" v-if="isRouterShow" />
 				</keep-alive>

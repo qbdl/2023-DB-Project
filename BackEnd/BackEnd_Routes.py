@@ -5,9 +5,11 @@ import pymysql
 import os
 import sys
 import time
+import json
 from werkzeug.datastructures import FileStorage
+from datetime import datetime, date
 
-# sys.path.append("C:/Users/likejie/AppData/Local/Programs/Python/Python39/Lib/site-packages")
+sys.path.append("C:/Users/likejie/AppData/Local/Programs/Python/Python39/Lib/site-packages")
 from flask_cors import CORS
 
 # Global Variables
@@ -17,7 +19,7 @@ CORS(app, resources={r'/*': {'origins': '*'}}, supports_credentials=True)  # 解
 
 app.config['UPLOAD_FILE_FOLDER'] = './uploads/files'  # 设置上传文件的文件夹路径
 app.config['UPLOAD_IMAGE_FOLDER'] = './uploads/images'  # 设置上传图片的文件夹路径
-app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls', 'csv', 'doc', 'docx', 'jpg', 'jpeg', 'png','pdf'}  # 设置允许的文件类型
+app.config['ALLOWED_EXTENSIONS'] = {'xlsx', 'xls', 'csv', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'pdf'}  # 设置允许的文件类型
 
 # ----------------数据库配置--------------------#
 #  MySQL 数据库的实际信息
@@ -58,6 +60,26 @@ def teardown_request(exception):
 
 
 # -------------------------------数据库表操作------------------------------------#
+
+# -----------------登陆注册部分-----------------#
+@app.route('/login', methods=['POST'])
+def login():
+    info = {"code": 200, "data": {"access_token": "bqddxxwqmfncffacvbpkuxvwvqrhln"}, "msg": "成功"}
+    return json.dumps(info)
+
+
+@app.route('/auth/buttons', methods=['GET'])
+def buttons():
+    info = {"code": 200, "msg": "成功", "data": {"useProTable": ["add", "batchAdd", "export", "batchDelete", "status"],
+                                               "authButton": ["add", "edit", "delete", "import", "export"]}}
+    return json.dumps(info)
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    info = {"code": 200, "msg": "成功"}
+    return json.dumps(info)
+
 
 # -----------------个人信息(业主信息）管理部分-----------------#
 def get_personal_info_by_id(owner_id):
@@ -259,6 +281,47 @@ def upload_file():
 # ---------------------------------------------------------------#
 
 # -----------------车辆信息部分(没用上）-----------------#
+class DatetimeEncoder(json.JSONEncoder):
+    def default(self, obj: any) -> any:
+        """
+        重写json构造类，增加对解析时间的支持
+        """
+        if isinstance(obj, datetime):
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        elif isinstance(obj, date):
+            return obj.strftime('%Y-%m-%d')
+        else:
+            return json.JSONEncoder.default(self, obj)
+
+@app.route('/user/list', methods=['POST'])
+def getUserList():
+    cursor = g.db.cursor()
+    query = """
+            SELECT * FROM users
+        """
+    cursor.execute(query)
+    result = cursor.fetchall()
+    cursor.close()
+    print("results:",result)
+    info = {"code": 200, "msg": "成功", "data": {"list": result,
+        "pageNum": 1, "pageSize": 25, "total": len(result)}}
+    return json.dumps(info,cls=DatetimeEncoder)
+
+
+@app.route('/user/gender', methods=['GET'])
+def gender():
+    info = {"code": 200, "data": [{"genderLabel": "男", "genderValue": 1}, {"genderLabel": "女", "genderValue": 2}],
+            "msg": "成功"}
+    return json.dumps(info)
+
+
+@app.route('/user/status', methods=['GET'])
+def status():
+    info = {"code": 200, "data": [{"userLabel": "启用", "userStatus": 1}, {"userLabel": "禁用", "userStatus": 0}],
+            "msg": "成功"}
+    return json.dumps(info)
+
+
 @app.route('/test', methods=['POST'])
 def my_test():
     data = request.get_json()
@@ -266,35 +329,35 @@ def my_test():
 
 
 # 获取用户列表
-@app.route('/getUserList', methods=['POST'])
-def get_user_list():
-    data = request.get_json()
-    page = data.get("page", 1)
-    size = data.get("size", 10)
-
-    cursor = g.db.cursor()
-    query = """
-        SELECT * FROM user
-        LIMIT %s OFFSET %s
-    """
-    cursor.execute(query, (size, (page - 1) * size))
-    result = cursor.fetchall()
-    cursor.close()
-
-    users = []
-    if result:
-        for row in result:
-            users.append({
-                'id': row['id'],
-                'username': row['username'],
-                'email': row['email'],
-                'gender': row['gender'],
-                'status': row['status'],
-                'department': row['department'],
-                'role': row['role'],
-            })
-
-    return jsonify({'list': users, 'total': len(users)})
+# @app.route('/getUserList', methods=['POST'])
+# def get_user_list():
+#     data = request.get_json()
+#     page = data.get("page", 1)
+#     size = data.get("size", 10)
+#
+#     cursor = g.db.cursor()
+#     query = """
+#         SELECT * FROM user
+#         LIMIT %s OFFSET %s
+#     """
+#     cursor.execute(query, (size, (page - 1) * size))
+#     result = cursor.fetchall()
+#     cursor.close()
+#
+#     users = []
+#     if result:
+#         for row in result:
+#             users.append({
+#                 'id': row['id'],
+#                 'username': row['username'],
+#                 'email': row['email'],
+#                 'gender': row['gender'],
+#                 'status': row['status'],
+#                 'department': row['department'],
+#                 'role': row['role'],
+#             })
+#
+#     return jsonify({'list': users, 'total': len(users)})
 
 
 # 新增用户
