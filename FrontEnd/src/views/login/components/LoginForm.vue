@@ -10,7 +10,7 @@
 			</el-input>
 		</el-form-item>
 		<el-form-item prop="password">
-			<el-input type="password" v-model="loginForm.password" placeholder="密码：helloWorld!" show-password
+			<el-input type="password" v-model="loginForm.password" placeholder="123!" show-password
 				autocomplete="new-password">
 				<template #prefix>
 					<el-icon class="el-input__icon">
