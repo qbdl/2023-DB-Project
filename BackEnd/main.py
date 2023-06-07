@@ -5,7 +5,7 @@ import os
 import sys
 from routes import register_blueprints  # 使用蓝图blueprint改变的地方
 
-sys.path.append("C:/Users/likejie/AppData/Local/Programs/Python/Python39/Lib/site-packages")
+# sys.path.append("C:/Users/likejie/AppData/Local/Programs/Python/Python39/Lib/site-packages")
 from flask_cors import CORS
 
 # Global Variables
