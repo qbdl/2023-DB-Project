@@ -48,7 +48,7 @@ export namespace Login {
 export namespace User {
 	export interface ReqUserParams extends ReqPage {
 		username: string;
-		gender: number;
+		// gender: string;
 		idCard: string;
 		email: string;
 		address: string;
@@ -58,7 +58,7 @@ export namespace User {
 	export interface ResUserList {
 		id: string;
 		username: string;
-		gender: number;
+		// gender: string;
 		user: {
 			detail: {
 				age: number;

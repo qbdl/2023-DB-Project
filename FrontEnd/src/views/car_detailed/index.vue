@@ -55,32 +55,6 @@ import {
 
 const router = useRouter();
 
-//lkj add here
-const API_BASE_URL = "http://localhost:5000";
-const my_user_list_api = "http://localhost:5000/getUserList";
-async function my_getUserList(params) {
-	try {
-		// 修改 API 请求地址和参数格式
-		const response = await axios.post('http://localhost:5000/getUserList', params);
-
-		// 确保数据格式正确
-		if (response.data && response.data.data && Array.isArray(response.data.data.list)) {
-			return {
-				data: response.data.data.list,
-				total: response.data.data.total,
-			};
-		} else {
-			throw new Error('数据格式不正确');
-		}
-	} catch (error) {
-		console.error('获取用户列表失败:', error.message);
-		return {
-			data: [],
-			total: 0,
-		};
-	}
-}
-
 
 // 跳转详情页
 const toDetail = () => {
@@ -109,15 +83,15 @@ const columns: ColumnProps<User.ResUserList>[] = [
 	{
 		prop: "gender",
 		label: "性别",
-		width: 120,
-		sortable: true,
-		enum: getUserGender,
-		search: { el: "select" },
-		fieldNames: { label: "genderLabel", value: "genderValue" }
+		// width: 120,
+		// sortable: true,
+		// enum: ["男","女"],
+		// search: { el: "select" },
+		// fieldNames: { label: "genderLabel", value: "genderValue" }
 	},
-	{ prop: "idCard", label: "身份证号" },
+	{ prop: "idCard", label: "身份证号", width: 120, search: { el: "input" } },
 	{ prop: "email", label: "邮箱" },
-	{ prop: "address", label: "居住地址" },
+	{ prop: "address", label: "居住地址", width: 120, search: { el: "input" }  },
 	{
 		prop: "status",
 		label: "用户状态",

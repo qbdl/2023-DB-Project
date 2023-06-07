@@ -147,7 +147,7 @@ const columns: ColumnProps<User.ResUserList>[] = [
 		// 直接放字典数据
 		// enum: genderType,
 		// 字典请求不带参数
-		enum: getUserGender,
+		// enum: getUserGender,
 		// 字典请求携带参数
 		// enum: () => getUserGender({ id: 1 }),
 		search: { el: "select", props: { filterable: true } },

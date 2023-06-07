@@ -93,7 +93,7 @@ const columns: ColumnProps<User.ResUserList>[] = [
 		label: "性别",
 		width: 120,
 		sortable: true,
-		enum: getUserGender,
+		// enum: getUserGender,
 		search: { el: "select" },
 		fieldNames: { label: "genderLabel", value: "genderValue" }
 	},

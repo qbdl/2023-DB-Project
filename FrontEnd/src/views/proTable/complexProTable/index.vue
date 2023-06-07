@@ -80,7 +80,7 @@ const columns: ColumnProps<User.ResUserList>[] = [
 				prop: "gender",
 				label: "性别",
 				width: 100,
-				enum: getUserGender,
+				// enum: getUserGender,
 				fieldNames: { label: "genderLabel", value: "genderValue" }
 			},
 			{

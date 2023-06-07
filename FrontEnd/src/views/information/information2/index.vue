@@ -33,6 +33,7 @@ export default defineComponent({
 			title: "",
 			date: "",
 			author: "",
+			author_id: "1",//TODO: 要换成get当前用户的ID
 			status: "已发布",
 			content: "",
 		});
@@ -52,12 +53,12 @@ export default defineComponent({
 			}
 		};
 
-		const generateID = () => {
+		const generateID = () => {//TODO:修改为逐步增加
 			return "00" + (Math.floor(Math.random() * 1000) + 1);
 		};
 
 		const getCurrentDate = () => {
-			const currentDate = new Date();
+			const currentDate = new Date();//TODO:改成当前时间
 			return currentDate.toISOString().split("T")[0];
 		};
 
