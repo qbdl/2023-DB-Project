@@ -69,6 +69,8 @@ def get_personal_info_by_id(owner_id):
 
 @user_blueprint.route('/info', methods=['GET'])
 def get_personal_info():
+    # request.args.get针对获取GET数据
+
     # is_owner = request.args.get('is_owner', 0, type=int)
     # print(is_owner)
     owner_id = request.args.get('owner_id', None, type=int)  # 获取owner_id参数

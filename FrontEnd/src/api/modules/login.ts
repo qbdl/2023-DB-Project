@@ -10,6 +10,14 @@ import { GlobalStore } from "@/stores";
  * @name 登录模块
  */
 // * 用户登录
+export const my_loginApi=(username:any,password:any)=>{
+	console.log("username:",username);
+	console.log("password:",password);
+	return http.post(PORT1 + `/login`,{"username":username,"password":password});
+}
+
+
+
 export const loginApi = (params: Login.ReqLoginForm) => {
 	return http.post<Login.ResLogin>(PORT1 + `/login`, params, { headers: { noLoading: true } }); // 正常 post json 请求  ==>  application/json
 	return http.post<Login.ResLogin>(PORT1 + `/login`, params, { headers: { noLoading: true } }); // 控制当前请求不显示 loading

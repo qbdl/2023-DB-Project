@@ -33,7 +33,7 @@ import { ref, reactive, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { Login } from "@/api/interface";
 import { ElNotification } from "element-plus";
-import { loginApi } from "@/api/modules/login";
+import { loginApi,my_loginApi } from "@/api/modules/login";
 import { GlobalStore } from "@/stores";
 import { TabsStore } from "@/stores/modules/tabs";
 import { KeepAliveStore } from "@/stores/modules/keepAlive";
@@ -66,7 +66,8 @@ const login = (formEl: FormInstance | undefined) => {
 		loading.value = true;
 		try {
 			// 1.执行登录接口
-			const { data } = await loginApi({ ...loginForm, password: md5(loginForm.password) });
+			// const { data } = await loginApi({ ...loginForm, password: md5(loginForm.password) });
+			const { data } = await my_loginApi(loginForm.username,loginForm.password);
 			globalStore.setToken(data.access_token);
 
 			//增加来使得userInfo.roles不为空，原来是mock数据没有userInfo

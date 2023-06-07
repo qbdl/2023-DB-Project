@@ -17,6 +17,7 @@ create table personal_info
     emergency_contact_phone varchar(20)                                    not null,
     avatar_path             varchar(255) default '../../assets/images/userpic.jpg' null,
     faceInfo_path           varchar(255) default '../../assets/images/userpic.jpg' null,
+    password                varchar(255)                                   not null comment '登录密码',
     createTime              timestamp                                      null,
     primary key (id, idCard)
 
