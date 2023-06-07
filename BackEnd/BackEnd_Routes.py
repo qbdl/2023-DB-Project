@@ -92,12 +92,15 @@ def get_personal_info_by_id(owner_id):
     cursor.execute(query, (owner_id,))
 
     result = cursor.fetchone()
+    print("fetch results:", result)
     cursor.close()
 
     if result:
         personal_info = {
-            'owner_id': owner_id,
+            'id': owner_id,
+            'idCard': result['idCard'],
             'username': result['username'],
+            'gender': result['gender'],
             'phone': result['phone'],
             'address': result['address'],
             'email': result['email'],
@@ -109,25 +112,33 @@ def get_personal_info_by_id(owner_id):
             'securityCardNumber': result['security_card_number'],
             'emergencyContact': result['emergency_contact'],
             'emergencyContactPhone': result['emergency_contact_phone'],
-            'avatar_url': result['avatar_url']
+            'avatar_path': result['avatar_path'],
+            'faceInfo_path': result['faceInfo_path'],
+            # 'createTime': result['createTime']
         }
     else:
-        personal_info = {
-            'owner_id': '',
-            'username': '',
-            'phone': '',
-            'address': '',
-            'email': '',
-            'communityName': '',
-            'buildingNumber': '',
-            'unitNumber': '',
-            'doorNumber': '',
-            'parkingNumber': '',
-            'securityCardNumber': '',
-            'emergencyContact': '',
-            'emergencyContactPhone': '',
-            'avatar_url': '../../assets/images/userpic.jpg'
-        }
+        personal_info={}
+
+    #     personal_info = {
+    #         'id': '',
+    #         'idCard': '',
+    #         'username': '',
+    #         'gender': '',
+    #         'phone': '',
+    #         'address': '',
+    #         'email': '',
+    #         'communityName': '',
+    #         'buildingNumber': '',
+    #         'unitNumber': '',
+    #         'doorNumber': '',
+    #         'parkingNumber': '',
+    #         'securityCardNumber': '',
+    #         'emergencyContact': '',
+    #         'emergencyContactPhone': '',
+    #         'avatar_path': '../../assets/images/userpic.jpg',
+    #         'faceInfo_path': '../../assets/images/userpic.jpg',
+    #         'createTime': ''
+    #     }
     return jsonify(personal_info)
 
 
@@ -177,26 +188,31 @@ def update_personal_info():
 
     cursor = g.db.cursor()
     sql = """
-            UPDATE personal_info SET
-                username=%s,
-                phone=%s,
-                address=%s,
-                email=%s,
-                community_name=%s,
-                building_number=%s,
-                unit_number=%s,
-                door_number=%s,
-                parking_number=%s,
-                security_card_number=%s,
-                emergency_contact=%s,
-                emergency_contact_phone=%s,
-                avatar_url=%s
-            WHERE id = %s
-        """
+                UPDATE personal_info SET
+                    idCard=%s,
+                    username=%s,
+                    gender=%s,
+                    phone=%s,
+                    address=%s,
+                    email=%s,
+                    community_name=%s,
+                    building_number=%s,
+                    unit_number=%s,
+                    door_number=%s,
+                    parking_number=%s,
+                    security_card_number=%s,
+                    emergency_contact=%s,
+                    emergency_contact_phone=%s,
+                    avatar_path=%s,
+                    faceInfo_path=%s
+                WHERE idCard=%s
+            """
     # print("Executing SQL:", sql)  # Print generated SQL
 
     cursor.execute(sql, (
+        data['idCard'],
         data['username'],
+        data['gender'],
         data['phone'],
         data['address'],
         data['email'],
@@ -208,8 +224,10 @@ def update_personal_info():
         data['securityCardNumber'],
         data['emergencyContact'],
         data['emergencyContactPhone'],
-        data['avatar_url'],
-        data['owner_id'],  # Add this line
+        data['avatar_path'],
+        data['faceInfo_path'],
+        # data['createTime'],
+        data['idCard'],
     ))
     g.db.commit()
     cursor.close()
@@ -238,7 +256,7 @@ def upload_avatar():
         cursor = g.db.cursor()
         sql = """
             UPDATE personal_info SET
-                avatar_url=%s
+                avatar_path=%s
             WHERE id = %s
         """
         cursor.execute(sql, (os.path.join(app.config['UPLOAD_IMAGE_FOLDER'], filename), owner_id))
@@ -293,19 +311,20 @@ class DatetimeEncoder(json.JSONEncoder):
         else:
             return json.JSONEncoder.default(self, obj)
 
+
 @app.route('/user/list', methods=['POST'])
 def getUserList():
     cursor = g.db.cursor()
     query = """
-            SELECT * FROM users
+            SELECT * FROM users_outline
         """
     cursor.execute(query)
     result = cursor.fetchall()
     cursor.close()
-    print("results:",result)
+    print("results:", result)
     info = {"code": 200, "msg": "成功", "data": {"list": result,
-        "pageNum": 1, "pageSize": 25, "total": len(result)}}
-    return json.dumps(info,cls=DatetimeEncoder)
+                                               "pageNum": 1, "pageSize": 25, "total": len(result)}}
+    return json.dumps(info, cls=DatetimeEncoder)
 
 
 @app.route('/user/gender', methods=['GET'])
@@ -326,38 +345,6 @@ def status():
 def my_test():
     data = request.get_json()
     print("received this time:", data)
-
-
-# 获取用户列表
-# @app.route('/getUserList', methods=['POST'])
-# def get_user_list():
-#     data = request.get_json()
-#     page = data.get("page", 1)
-#     size = data.get("size", 10)
-#
-#     cursor = g.db.cursor()
-#     query = """
-#         SELECT * FROM user
-#         LIMIT %s OFFSET %s
-#     """
-#     cursor.execute(query, (size, (page - 1) * size))
-#     result = cursor.fetchall()
-#     cursor.close()
-#
-#     users = []
-#     if result:
-#         for row in result:
-#             users.append({
-#                 'id': row['id'],
-#                 'username': row['username'],
-#                 'email': row['email'],
-#                 'gender': row['gender'],
-#                 'status': row['status'],
-#                 'department': row['department'],
-#                 'role': row['role'],
-#             })
-#
-#     return jsonify({'list': users, 'total': len(users)})
 
 
 # 新增用户
@@ -480,28 +467,6 @@ def create_announcement():
 
     return jsonify({"message": "Announcement created successfully"}), 201
 
-
-#
-# # 插入数据到 personal_info 表的函数
-# def insert_personal_info(db, data):
-#     cursor = db.cursor()
-#     sql = """
-#     INSERT
-#     INTO
-#     personal_info(
-#         username, phone, address, email, community_name, building_number,
-#         unit_number, door_number, parking_number, security_card_number,
-#         emergency_contact, emergency_contact_phone, avatar_url
-#     )
-#     VALUES( % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s, % s)
-#     """
-#     cursor.executemany(sql, data)
-#     db.commit()
-#     cursor.close()
-
-
-# 检查文件是否为允许的文件类型
-
 @app.route('/', methods=['GET', 'POST'])
 def hello():
     return "Nice to see you again!"
@@ -512,17 +477,5 @@ if __name__ == '__main__':
         os.makedirs(app.config['UPLOAD_FILE_FOLDER'])  # 如果上传文件夹不存在，则创建
     if not os.path.exists(app.config['UPLOAD_IMAGE_FOLDER']):
         os.makedirs(app.config['UPLOAD_IMAGE_FOLDER'])
-
-    # test_data = [
-    #     ("张三", "13800138000", "上海市虹口区XX路XX号", "zhangsan@example.com", "阳光花园", "5栋", "2单元", "502室", "B-102", "AF-123456",
-    #      "李四", "18212345678"),
-    #     (
-    #         "王五", "13900139000", "上海市浦东新区XX路XX号", "wangwu@example.com", "绿地新城", "3栋", "1单元", "301室", "B-203",
-    #         "AF-234567",
-    #         "赵六",
-    #         "18323456789"),
-    # ]
-    # # 插入数据
-    # insert_personal_info(mydb,test_data)
 
     app.run(debug=True)

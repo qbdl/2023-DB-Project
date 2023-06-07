@@ -12,12 +12,18 @@
                 </div>
                 <!-- Add avatar container and input for uploading image -->
                 <div class="avatar-container">
-                    <img :src="defaultAvatar || selectedOwner.avatar_url" class="avatar">
+                    <img :src="defaultAvatar || selectedOwner.avatar_path" class="avatar">
                     <input v-if="editing" type="file" @change="uploadImage" ref="fileInput">
                 </div>
-                <el-descriptions class="table_user" title="业主具体信息" direction="vertical" :column="2" :size="large" border>
+                <el-descriptions class="table_user" title="业主具体信息" direction="vertical" :column="2" size="large" border>
                     <el-descriptions-item label="用户名">
                         <el-input v-model="selectedOwner.username" :disabled="!editing"></el-input>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="性别">
+                        <el-input v-model="selectedOwner.gender" :disabled="!editing"></el-input>
+                    </el-descriptions-item>
+                    <el-descriptions-item label="身份证号">
+                        <el-input v-model="selectedOwner.idCard" :disabled="!editing"></el-input>
                     </el-descriptions-item>
                     <el-descriptions-item label="电话">
                         <el-input v-model="selectedOwner.phone" :disabled="!editing"></el-input>
@@ -71,9 +77,13 @@ export default {
         let fileInput = ref(null);
         let owners = ref(null);
         let defaultAvatar = "../../assets/images/userpic.jpg"; // Set the URL of the default avatar image
-        let avatar_url = ref("../../assets/images/userpic.jpg")//初始化为../../assets/images/userpic.jpg
-
+        let avatar_path = ref("../../assets/images/userpic.jpg");//初始化为../../assets/images/userpic.jpg
+        let gender = ref(null);
+        let idCard = ref(null);
+        // let createTime = ref(null);
+        let status = ref(null);
         let selectedOwner = ref(null);
+        let faceInfo_path=ref("../../assets/images/userpic.jpg");
 
         //从后端获取 选择的业主信息
         let handleOwnerChange = async function () {
@@ -85,7 +95,8 @@ export default {
                             { is_owner: 1, owner_id: selectedId } // 业主信息
                     });
                 selectedOwner.value = response.data;
-                console.log("getOwners data:", response.data);
+                // console.log("getOwners data:", response.data);
+                console.log("getOwners data:", selectedOwner.value);
             } catch (error) {
                 console.error(error);
                 ElMessage({ message: "无法获取业主信息，请重试", type: "error" });
@@ -101,7 +112,8 @@ export default {
                 // console.log("editProfile:", selectedOwner.value);
                 // console.log(selectedOwner.value.id);
                 const data = {
-                    owner_id: selectedOwner.value.owner_id,
+                    // owner_id: selectedOwner.value.owner_id,
+                    idCard: selectedOwner.value.idCard,
                     username: selectedOwner.value.username,
                     phone: selectedOwner.value.phone,
                     address: selectedOwner.value.address,
@@ -114,8 +126,13 @@ export default {
                     securityCardNumber: selectedOwner.value.securityCardNumber,
                     emergencyContact: selectedOwner.value.emergencyContact,
                     emergencyContactPhone: selectedOwner.value.emergencyContactPhone,
-                    avatar_url: selectedOwner.value.avatar_url
+                    avatar_path: selectedOwner.value.avatar_path,
+                    gender: selectedOwner.value.gender,
+                    // createTime: selectedOwner.value.createTime,
+                    status: selectedOwner.value.status,
+                    faceInfo_path: selectedOwner.value.faceInfo_path,
                 };
+                console.log("transfer to BackEnd data:",data);
                 //传回给后端数据库
                 try {
                     await axios.put("http://localhost:5000/myapi/info_update", data, {
@@ -137,7 +154,7 @@ export default {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    selectedOwner.value.avatar_url = e.target.result;
+                    selectedOwner.value.avatar_path = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
@@ -164,13 +181,17 @@ export default {
             defaultAvatar,
             editing,
 
-            avatar_url,
-
+            avatar_path,
             owners,
             selectedOwner,
             handleOwnerChange,
             editProfile,
             uploadImage,
+            gender,
+            idCard,
+            // createTime,
+            status,
+            faceInfo_path,
         };
     },
 };

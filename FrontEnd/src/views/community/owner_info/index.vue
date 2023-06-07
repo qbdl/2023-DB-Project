@@ -9,7 +9,7 @@
 				<el-avatar class="avatar" src="../../assets/images/userpic.jpg" :size="150" />
 			</div>
 			<!-- 描述性列表 -->
-			<el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" :size="Large" border>
+			<el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" size="large" border>
 				<el-descriptions-item label="用户名" class="username-item">
 					qbdl
 				</el-descriptions-item>

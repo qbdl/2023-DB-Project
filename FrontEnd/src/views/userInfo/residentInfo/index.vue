@@ -6,14 +6,20 @@
             </div>
             <!-- Add avatar container and input for uploading image -->
             <div class="avatar-container">
-                <img :src="defaultAvatar || avatar_url" class="avatar">
+                <img :src="defaultAvatar || avatar_path" class="avatar">
                 <input v-if="editing" type="file" @change="uploadImage" ref="fileInput">
             </div>
 
             <!-- 描述性列表 -->
-            <el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" :size="Large" border>
+            <el-descriptions class="table_user" title="个人信息" direction="vertical" :column="2" size="large" border>
                 <el-descriptions-item label="用户名">
                     <el-input v-model="username" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="性别">
+                    <el-input v-model="gender" :disabled="!editing"></el-input>
+                </el-descriptions-item>
+                <el-descriptions-item label="身份证号">
+                    <el-input v-model="idCard" :disabled="!editing"></el-input>
                 </el-descriptions-item>
                 <el-descriptions-item label="电话">
                     <el-input v-model="phone" :disabled="!editing"></el-input>
@@ -81,7 +87,12 @@ export default {
         let securityCardNumber = ref(null); // 初始化为 null
         let emergencyContact = ref(null); // 初始化为 null
         let emergencyContactPhone = ref(null); // 初始化为 null
-        let avatar_url = ref("../../assets/images/userpic.jpg")//初始化为../../assets/images/userpic.jpg
+        let avatar_path = ref("../../assets/images/userpic.jpg")//初始化为../../assets/images/userpic.jpg
+        let faceInfo_path = ref("../../assets/images/userpic.jpg")//初始化为../../assets/images/userpic.jpg
+        let gender = ref(null);
+        let idCard = ref(null);
+        let createTime = ref(null);
+        let status = ref(null);
 
         let editProfile = async function () {
             editing.value = !editing.value;
@@ -101,7 +112,12 @@ export default {
                     securityCardNumber: securityCardNumber.value,
                     emergencyContact: emergencyContact.value,
                     emergencyContactPhone: emergencyContactPhone.value,
-                    avatar_url: avatar_url.value
+                    avatar_path: avatar_path.value,
+                    gender: gender.value,
+                    idCard: idCard.value,
+                    createTime: createTime.value,
+                    status: status.value,
+                    faceInfo_path:faceInfo_path.value,
                 };
                 //传回给后端数据库
                 try {
@@ -128,8 +144,8 @@ export default {
                         params:
                             { owner_id: 1 } // TODO:修改为个人信息ID
                     });
-                    avatar_url.value = URL.createObjectURL(file);
-                    // avatar_url.value = response.data.avatar_url;
+                    avatar_path.value = URL.createObjectURL(file);
+                    // avatar_path.value = response.data.avatar_path;
                     ElMessage({ message: "头像上传成功", type: "success" });
                 } catch (error) {
                     console.error(error);
@@ -161,7 +177,12 @@ export default {
                 securityCardNumber.value = data.securityCardNumber;
                 emergencyContact.value = data.emergencyContact;
                 emergencyContactPhone.value = data.emergencyContactPhone;
-                avatar_url.value = data.avatar_url;
+                avatar_path.value = data.avatar_path;
+                gender.value = data.gender;
+                idCard.value = data.idCard;
+                createTime.value = data.createTime;
+                status.value = data.status;
+                faceInfo_path.value=data.faceInfo_path;
             } catch (error) {
                 console.error(error);
             }
@@ -189,7 +210,12 @@ export default {
             emergencyContactPhone,
             editProfile,
             uploadImage,
-            avatar_url,
+            avatar_path, 
+            gender,
+            idCard,
+            createTime,
+            status,
+            faceInfo_path,
         };
 
     },

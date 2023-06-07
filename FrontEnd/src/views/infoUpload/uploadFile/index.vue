@@ -8,9 +8,9 @@
 					:before-remove="beforeRemove" :file-list="fileList" list-type="text" :auto-upload="true"
 					:multiple="true" :limit="3" :on-exceed="handleExceed">
 					<div class="button-wrapper">
-						<el-button size="Large" type="primary">点击上传</el-button>
+						<el-button size="large" type="primary">点击上传</el-button>
 						<!-- 添加预览按钮 -->
-						<!-- <el-button size="Large" type="warning" @click="handlePreview(selectedFile)">预览文件</el-button> -->
+						<!-- <el-button size="large" type="warning" @click="handlePreview(selectedFile)">预览文件</el-button> -->
 						<div slot="tip" class="el-upload__tip" size="large">
 							支持的文件类型：.xlsx, .xls, .csv, .doc, .docx, .pdf
 						</div>
