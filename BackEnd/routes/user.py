@@ -67,8 +67,8 @@ def get_personal_info_by_id(owner_id):
     return jsonify(personal_info)
 
 
-@user_blueprint.route('/myapi/info', methods=['GET'])
-def get_info():
+@user_blueprint.route('/info', methods=['GET'])
+def get_personal_info():
     # is_owner = request.args.get('is_owner', 0, type=int)
     # print(is_owner)
     owner_id = request.args.get('owner_id', None, type=int)  # 获取owner_id参数
@@ -81,7 +81,7 @@ def get_info():
 
 
 # ----------------业主信息管理——获取所有业主用户名-----------------#
-@user_blueprint.route('/myapi/owners', methods=['GET'])
+@user_blueprint.route('/owners', methods=['GET'])
 def get_all_owners():
     cursor = g.db.cursor()
     query = """
@@ -105,7 +105,7 @@ def get_all_owners():
 
 # -----------------个人信息(业主信息）更新部分-----------------#
 # 更新数据——由前端调用自动更新
-@user_blueprint.route('/myapi/info_update', methods=['PUT'])
+@user_blueprint.route('/info_update', methods=['PUT'])
 def update_personal_info():
     data = request.get_json()
 
@@ -175,7 +175,7 @@ class DatetimeEncoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
 
 
-@user_blueprint.route('/user/list', methods=['POST'])
+@user_blueprint.route('/list', methods=['POST'])
 def getUserList():
     cursor = g.db.cursor()
     query = """
@@ -197,7 +197,7 @@ def getUserList():
 #     return json.dumps(info)
 
 
-@user_blueprint.route('/user/status', methods=['GET'])
+@user_blueprint.route('/status', methods=['GET'])
 def status():
     info = {"code": 200, "data": [{"userLabel": "启用", "userStatus": 1}, {"userLabel": "禁用", "userStatus": 0}],
             "msg": "成功"}

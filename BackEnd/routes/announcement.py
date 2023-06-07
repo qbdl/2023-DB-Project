@@ -6,7 +6,7 @@ announcement_blueprint = Blueprint('announcement',__name__)
 
 
 # 接受安防公告
-@announcement_blueprint.route('/myapi/announcements', methods=['GET'])
+@announcement_blueprint.route('/receive_announcements', methods=['GET'])
 def get_announcements():
     cursor = g.db.cursor()
     cursor.execute("SELECT * FROM security_announcements")
@@ -16,7 +16,7 @@ def get_announcements():
 
 
 # 发布安防公告
-@announcement_blueprint.route('/myapi/create_announcement', methods=['POST'])
+@announcement_blueprint.route('/create_announcement', methods=['POST'])
 def create_announcement():
     announcement = request.json
     id = announcement['id']

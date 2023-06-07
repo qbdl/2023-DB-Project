@@ -121,7 +121,7 @@ export default {
                 };
                 //传回给后端数据库
                 try {
-                    await axios.put("http://localhost:5000/myapi/info_update", data);
+                    await axios.put("http://localhost:5000/user/info_update", data);
                     ElMessage({ message: "个人信息更新成功", type: "success" });
                 } catch (error) {
                     console.error(error);
@@ -137,7 +137,7 @@ export default {
                 const formData = new FormData();
                 formData.append("file", file);
                 try {
-                    await axios.post("http://localhost:5000/upload_avatar", formData, {
+                    await axios.post("http://localhost:5000/upload/upload_avatar", formData, {
                         headers: {
                             "Content-Type": "multipart/form-data",
                         },
@@ -158,7 +158,7 @@ export default {
         // 从后端获取初始数据
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/myapi/info",
+                const response = await axios.get("http://localhost:5000/user/info",
                     {
                         params:
                             { is_owner: 0 } //用户个人信息

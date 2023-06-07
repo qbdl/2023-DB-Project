@@ -89,7 +89,7 @@ export default {
         let handleOwnerChange = async function () {
             try {
                 const selectedId = selectedOwner.value.id; // 从当前选中的业主获取ID
-                const response = await axios.get("http://localhost:5000/myapi/info",
+                const response = await axios.get("http://localhost:5000/user/info",
                     {
                         params:
                             { is_owner: 1, owner_id: selectedId } // 业主信息
@@ -135,7 +135,7 @@ export default {
                 console.log("transfer to BackEnd data:",data);
                 //传回给后端数据库
                 try {
-                    await axios.put("http://localhost:5000/myapi/info_update", data, {
+                    await axios.put("http://localhost:5000/user/info_update", data, {
                         headers: {
                             'Content-Type': 'application/json'
                         }
@@ -164,7 +164,7 @@ export default {
         // 从后端获取初始业主列表
         const fetchOwners = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/myapi/owners");
+                const response = await axios.get("http://localhost:5000/user/owners");
                 // console.log('API response:', response.data); // 添加这一行
                 owners.value = response.data;
                 console.log("handleOwnerChange data:", response.data); // 添加此行

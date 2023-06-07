@@ -34,7 +34,7 @@ export default {
 	},
 	setup() {
 		const selectedFile = ref(null); // 添加 selectedFile 数据属性
-		const uploadUrl = "http://localhost:5000/upload"; // 替换为你的上传API URL
+		const uploadUrl = "http://localhost:5000/upload/upload_file"; //上传API URL
 		const fileList = ref([]);
 
 		const beforeUpload = (file) => {

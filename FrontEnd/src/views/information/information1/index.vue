@@ -47,7 +47,7 @@ export default {
 
 		const fetchAnnouncements = async () => {
 			try {
-				const response = await axios.get("http://localhost:5000/myapi/announcements");
+				const response = await axios.get("http://localhost:5000/announce/receive_announcements");
 				console.log(response);
 				const data = response.data;
 				tableData.value = data;

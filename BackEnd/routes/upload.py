@@ -41,6 +41,7 @@ def upload_avatar():
         return jsonify({"error": "Unsupported file type"}), 400
 
 
+# 上传文件
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']
 
@@ -53,8 +54,7 @@ def upload_save_file(file: FileStorage, path: str):
     return new_filename
 
 
-# 上传文件
-@upload_blueprint.route('/upload', methods=['POST'])
+@upload_blueprint.route('/upload_file', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400

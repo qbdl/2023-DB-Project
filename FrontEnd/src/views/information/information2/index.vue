@@ -42,7 +42,7 @@ export default defineComponent({
 			try {
 				announcement.value.id = generateID();
 				announcement.value.date = getCurrentDate();
-				const response = await axios.post("http://localhost:5000/myapi/create_announcement", announcement.value);
+				const response = await axios.post("http://localhost:5000/announce/create_announcement", announcement.value);
 				console.log(response);
 				// alert("公告发布成功");
 				ElMessage({ message: "公告发布成功", type: "success" });
