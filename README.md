@@ -24,12 +24,16 @@
   npm run dev
   ```
 
+  <img src="./assets/image-20230608101313732.png" alt="image-20230608101313732" style="zoom: 67%;" />
+
 - 后端: 
 
   ```powershell
   cd .\BackEnd
   python main.py
   ```
+
+  <img src="./assets/image-20230608101533670.png" alt="image-20230608101533670" style="zoom: 80%;" />
 
 - 数据库:
 
@@ -47,6 +51,7 @@
 
 - 前后端分离+数据库
 - 数据库加入触发器来保证数据一致性
+- 人脸识别（基于前端数据）
 - flask 蓝图多文件
 - 数据表间建立外键等约束
 - 登录，个人信息等走自己的后端而非mock端
