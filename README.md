@@ -1,6 +1,6 @@
-# 2023-DB-Project
+# 2023-DB-Project ![redis](https://img.shields.io/badge/qbdl-Intelligent--Security--Community-green2023)
 
-数据库课程项目作业-智慧安防小区系统  Intelligent-Security-Community ![redis](https://img.shields.io/badge/qbdl-Intelligent--Security--Community-green2023)
+数据库课程项目作业-智慧安防小区系统  Intelligent-Security-Community
 
 前端Vue3,后端flask+mysql
 
