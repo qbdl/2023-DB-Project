@@ -6,7 +6,7 @@
 
 基础前端模型参考的是Geeker-Admin https://github.com/HalseySpicy/Geeker-Admin 
 
-
+node version : v16.16.0
 
 ## 一、使用说明
 
